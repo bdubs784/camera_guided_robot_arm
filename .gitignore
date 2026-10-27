@@ -1,0 +1,30 @@
+# secrets: WiFi names and passwords live here, never commit
+firmware/**/secrets.h
+secrets.h
+.env
+*.key
+
+# data recorded on the Pi (backed up separately)
+arm_data/
+*.jsonl
+*.npz
+calib_*.json
+*_images/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# test and lint leftovers
+.coverage
+__pycache__/
+.ruff_cache/
+.pytest_cache/

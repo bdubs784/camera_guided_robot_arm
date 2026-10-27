@@ -1,0 +1,66 @@
+<mujoco model="gripper">
+  <!-- Built from the Fusion STEP export. Lengths in metres. Joint angle 0 = the pose in the export
+       (fingers about 22 mm apart). Left gear negative = close, positive = open. -->
+  <compiler angle="radian" meshdir="meshes" autolimits="true"/>
+  <option timestep="0.001" integrator="implicitfast" gravity="0 0 -9.81"/>
+  <default>
+    <equality solref="0.002 1" solimp="0.995 0.9995 0.0001"/>
+    <default class="vis"><geom type="mesh" contype="0" conaffinity="0" density="1250"/></default>
+    <default class="grip"><geom contype="1" conaffinity="1" friction="1.0 0.02 0.001" rgba="0.2 0.5 0.5 0.35" density="0"
+                                solref="0.004 1" condim="4"/></default>
+  </default>
+  <asset>
+    <mesh name="body" file="body.stl" scale="0.001 0.001 0.001"/><mesh name="gear_l" file="gear_l.stl" scale="0.001 0.001 0.001"/><mesh name="gear_r" file="gear_r.stl" scale="0.001 0.001 0.001"/><mesh name="finger_l" file="finger_l.stl" scale="0.001 0.001 0.001"/><mesh name="finger_r" file="finger_r.stl" scale="0.001 0.001 0.001"/><mesh name="link_l" file="link_l.stl" scale="0.001 0.001 0.001"/><mesh name="link_r" file="link_r.stl" scale="0.001 0.001 0.001"/>
+  </asset>
+  <worldbody>
+    <light pos="0 0.05 0.4" dir="0 0 -1"/>
+    <geom name="table" type="plane" size="0.3 0.3 0.01" pos="0 0 -0.003" rgba="0.92 0.92 0.90 1" contype="1" conaffinity="1"/>
+    <body name="gripper_body" pos="0 0 0">
+      <geom class="vis" mesh="body" rgba="0.85 0.45 0.35 1"/>
+      <body name="gear_l" pos="-0.013950 0.037580 0.000000">
+        <joint name="gear_l" type="hinge" axis="0 0 1" range="-0.37 1.30" damping="0.002" armature="0.0003"/>
+        <geom class="vis" mesh="gear_l" pos="0.013950 -0.037580 -0.000000" rgba="0.45 0.72 0.42 1"/>
+        <body name="finger_l" pos="-0.014220 0.027550 0.000000">
+          <joint name="finger_pin_l" type="hinge" axis="0 0 1" damping="0.0005" armature="0.000005"/>
+          <geom class="vis" mesh="finger_l" pos="0.028170 -0.065130 -0.000000" rgba="0.90 0.78 0.35 1"/>
+          <geom name="jaw_l" class="grip" type="box" size="0.005000 0.007000 0.001500" pos="0.010770 0.046870 -0.001500"/>
+          <site name="tip_l" pos="0.015820 0.046870 -0.001500" size="0.0008" rgba="1 0 0 1"/>
+        </body>
+      </body>
+      <body name="link_l" pos="-0.003670 0.055880 0.000000">
+        <joint name="link_pin_l" type="hinge" axis="0 0 1" damping="0.0005" armature="0.000005"/>
+        <geom class="vis" mesh="link_l" pos="0.003670 -0.055880 -0.000000" rgba="0.72 0.55 0.80 1"/>
+      </body>
+      <body name="gear_r" pos="0.013050 0.037580 0.000000">
+        <joint name="gear_r" type="hinge" axis="0 0 1" range="-1.30 0.37" damping="0.002" armature="0.0003"/>
+        <geom class="vis" mesh="gear_r" pos="-0.013050 -0.037580 -0.000000" rgba="0.45 0.72 0.42 1"/>
+        <body name="finger_r" pos="0.014220 0.027550 0.000000">
+          <joint name="finger_pin_r" type="hinge" axis="0 0 1" damping="0.0005" armature="0.000005"/>
+          <geom class="vis" mesh="finger_r" pos="-0.027270 -0.065130 -0.000000" rgba="0.90 0.78 0.35 1"/>
+          <geom name="jaw_r" class="grip" type="box" size="0.005000 0.007000 0.001500" pos="-0.010770 0.046870 -0.001500"/>
+          <site name="tip_r" pos="-0.015820 0.046870 -0.001500" size="0.0008" rgba="1 0 0 1"/>
+        </body>
+      </body>
+      <body name="link_r" pos="0.002770 0.055880 0.000000">
+        <joint name="link_pin_r" type="hinge" axis="0 0 1" damping="0.0005" armature="0.000005"/>
+        <geom class="vis" mesh="link_r" pos="-0.002770 -0.055880 -0.000000" rgba="0.72 0.55 0.80 1"/>
+      </body>
+    </body>
+    <body name="block" pos="-0.000450 0.112000 0.007000">
+      <freejoint/>
+      <geom name="block" type="box" size="0.008 0.008 0.010" mass="0.02" rgba="0.3 0.45 0.8 1" friction="1.0 0.02 0.001" condim="4"/>
+    </body>
+  </worldbody>
+  <equality>
+    <!-- the two pins that close each four-bar loop (link to finger) -->
+    <connect name="pin_l" body1="link_l" body2="finger_l" anchor="-0.013130 0.028080 0.000000"/>
+    <connect name="pin_r" body1="link_r" body2="finger_r" anchor="0.013130 0.028080 0.000000"/>
+    <!-- the two gears mesh: equal and opposite -->
+    <joint name="mesh" joint1="gear_r" joint2="gear_l" polycoef="0 -1 0 0 0"/>
+  </equality>
+  <actuator>
+    <!-- one servo. ctrl is the GRIPPER SLIDER value from the arm page: 160 = closed, 100 = 45 mm apart, 40 = wide open.
+         Fitted to the measured gaps: left gear angle (deg, from the export pose) = (160 - slider) * 0.772 - 20.2 -->
+    <general name="servo" joint="gear_l" biastype="affine" gainprm="-0.020211" biasprm="2.704911 -1.5 -0.12" ctrlrange="40 160" forcerange="-0.6 0.6"/>
+  </actuator>
+</mujoco>

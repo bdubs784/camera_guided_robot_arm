@@ -1,0 +1,90 @@
+<mujoco model="arm_twin">
+    <compiler angle="radian" eulerseq="XYZ" inertiafromgeom="true" meshdir="meshes" autolimits="true" />
+    <option timestep="0.001" integrator="implicitfast" cone="elliptic" impratio="10" noslip_iterations="4"/>
+    <asset>
+        <mesh name="floor_1" file="floor_1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="plywood_and_base_1" file="plywood_and_base_1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="tower_1" file="tower_1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="upper_arm_1" file="upper_arm_1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="forearm_1" file="forearm_1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="wrist_1" file="wrist_1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="hand_1" file="hand_1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="grip_body" file="grip_body.stl" scale="0.001 0.001 0.001"/><mesh name="grip_gear_l" file="grip_gear_l.stl" scale="0.001 0.001 0.001"/><mesh name="grip_gear_r" file="grip_gear_r.stl" scale="0.001 0.001 0.001"/><mesh name="grip_finger_l" file="grip_finger_l.stl" scale="0.001 0.001 0.001"/><mesh name="grip_finger_r" file="grip_finger_r.stl" scale="0.001 0.001 0.001"/><mesh name="grip_link_l" file="grip_link_l.stl" scale="0.001 0.001 0.001"/><mesh name="grip_link_r" file="grip_link_r.stl" scale="0.001 0.001 0.001"/></asset><default>
+    <equality solref="0.002 1" solimp="0.995 0.9995 0.0001"/>
+    <default class="vis"><geom type="mesh" contype="0" conaffinity="0" density="1250"/></default>
+    <default class="grip"><geom contype="1" conaffinity="1" friction="1.0 0.02 0.001" rgba="0.2 0.5 0.5 0.35" density="0"
+                                solref="0.004 1" condim="4"/></default>
+  </default>
+    <worldbody>
+    <geom name="stand" type="box" size="0.02 0.02 0.06373" pos="0.14277 -0.35654 0.04473" rgba="0.55 0.55 0.58 1" contype="1" conaffinity="1" friction="1.0 0.02 0.001"/>
+    <body name="block" pos="0.14277 -0.35654 0.11847">
+      <freejoint/>
+      <geom name="block" type="box" size="0.010 0.010 0.010" mass="0.015" rgba="0.3 0.45 0.8 1" friction="1.0 0.02 0.001" condim="4"/>
+    </body>
+    <geom name="table" type="plane" size="1 1 0.01" pos="0 0 -0.01900" rgba="0 0 0 0" contype="1" conaffinity="1"/>
+        <light directional="true" pos="-0.5 0.5 3" dir="0 0 -1" />
+        <body name="plywood_and_base_1" pos="0.0065070610979302045 0.00650706109793024 0.0" euler="0.0 -0.0 0.0">
+            <geom name="plywood_and_base_1_geom" type="mesh" mesh="plywood_and_base_1" pos="0 0 0" euler="0 0 0" contype="0" conaffinity="0" group="2" mass="2.0" rgba="0.80 0.70 0.52 1" />
+            <body name="tower_1" pos="0.002734163842370947 -0.006434776496038424 -0.057097792117905034" euler="-3.2410072319455776e-17 8.030184384904812e-17 -1.169006788342171">
+                <joint name="Revolute-4" type="hinge" axis="-8.030184384904812e-17 -3.2410072319455776e-17 1.0" pos="-0.006991534042854649 -8.012557506514372e-08 0.16309779211790504" damping="0.4" armature="0.01" />
+                <geom name="tower_1_geom" type="mesh" mesh="tower_1" pos="0 0 0" euler="0 0 0" contype="0" conaffinity="0" group="2" mass="1.0" rgba="0.55 0.58 0.62 1" />
+                <body name="upper_arm_1" pos="-0.04957583887000338 -0.006568704601121094 0.047278467798133814" euler="0.001337755119642289 0.1396199732177369 0.009612312381372628">
+                    <joint name="Revolute-7" type="hinge" axis="-0.009518763027076327 -0.9999550296265498 -1.8537452566025348e-08" pos="0.04368366281103653 -0.03341725861076651 0.2627489636400233" damping="0.4" armature="0.01" />
+                    <geom name="upper_arm_1_geom" type="mesh" mesh="upper_arm_1" pos="0 0 0" euler="0 0 0" contype="0" conaffinity="0" group="2" mass="0.2" rgba="0.30 0.50 0.75 1" />
+                    <body name="forearm_1" pos="-0.005305076571726479 5.0499337925069836e-05 0.0031993240041814077" euler="0.0001951112325420616 0.020494033139276207 1.999378018837968e-06">
+                        <joint name="Revolute-12" type="hinge" axis="-0.00951876261949608 -0.9999550296304295 -2.123667289244402e-08" pos="0.15312352144211872 -0.03445849541999096 0.2604503632767352" damping="0.4" armature="0.01" />
+                        <geom name="forearm_1_geom" type="mesh" mesh="forearm_1" pos="0 0 0" euler="0 0 0" contype="0" conaffinity="0" group="2" mass="0.15" rgba="0.35 0.62 0.55 1" />
+                        <body name="wrist_1" pos="0.10343520666909202 0.0006547245373129177 -0.08079817752246214" euler="0.07376412650895942 -0.3182224111495165 -0.2414562914116024">
+                            <joint name="Revolute-14" type="hinge" axis="-0.21832279589291786 0.9758769517303404 -1.9488751695773132e-08" pos="0.2542632737791528 0.01114097302206599 0.27545569268425285" damping="0.4" armature="0.01" />
+                            <geom name="wrist_1_geom" type="mesh" mesh="wrist_1" pos="0 0 0" euler="0 0 0" contype="0" conaffinity="0" group="2" mass="0.1" rgba="0.80 0.55 0.30 1" />
+                            <body name="hand_1" pos="0.05529946427109447 0.00034821488768745025 0.1700238883057129" euler="-0.05910369634541394 0.13329978177393795 0.8588951259225273">
+                                <joint name="Revolute-13" type="hinge" axis="-0.7426639971274572 0.5985377577879932 -0.30033704208071266" pos="0.19692468562029947 -0.16823685792417467 0.14038189977900412" damping="0.4" armature="0.01" />
+                                <geom name="hand_1_geom" type="mesh" mesh="hand_1" pos="0 0 0" euler="0 0 0" contype="0" conaffinity="0" group="2" mass="0.12" rgba="0.6 0.6 0.6 0.10" />
+                                <body name="gripper_body" pos="0.198217 -0.171218 0.156678" quat="0.108399 0.885280 0.434719 0.124690">
+      <geom class="vis" mesh="grip_body" rgba="0.85 0.45 0.35 1" mass="0.09"/>
+      <body name="gear_l" pos="-0.013950 0.037580 0.000000">
+        <joint name="gear_l" type="hinge" axis="0 0 1" range="-0.37 1.30" damping="0.002" armature="0.0003"/>
+        <geom class="vis" mesh="grip_gear_l" pos="0.013950 -0.037580 -0.000000" rgba="0.45 0.72 0.42 1"/>
+        <body name="finger_l" pos="-0.014220 0.027550 0.000000">
+          <joint name="finger_pin_l" type="hinge" axis="0 0 1" damping="0.0005" armature="0.000005"/>
+          <geom class="vis" mesh="grip_finger_l" pos="0.028170 -0.065130 -0.000000" rgba="0.90 0.78 0.35 1"/>
+          <geom name="jaw_l" class="grip" type="box" size="0.005000 0.007000 0.001500" pos="0.010770 0.046870 -0.001500"/>
+          <site name="tip_l" pos="0.015820 0.046870 -0.001500" size="0.0008" rgba="1 0 0 1"/>
+        </body>
+      </body>
+      <body name="link_l" pos="-0.003670 0.055880 0.000000">
+        <joint name="link_pin_l" type="hinge" axis="0 0 1" damping="0.0005" armature="0.000005"/>
+        <geom class="vis" mesh="grip_link_l" pos="0.003670 -0.055880 -0.000000" rgba="0.72 0.55 0.80 1"/>
+      </body>
+      <body name="gear_r" pos="0.013050 0.037580 0.000000">
+        <joint name="gear_r" type="hinge" axis="0 0 1" range="-1.30 0.37" damping="0.002" armature="0.0003"/>
+        <geom class="vis" mesh="grip_gear_r" pos="-0.013050 -0.037580 -0.000000" rgba="0.45 0.72 0.42 1"/>
+        <body name="finger_r" pos="0.014220 0.027550 0.000000">
+          <joint name="finger_pin_r" type="hinge" axis="0 0 1" damping="0.0005" armature="0.000005"/>
+          <geom class="vis" mesh="grip_finger_r" pos="-0.027270 -0.065130 -0.000000" rgba="0.90 0.78 0.35 1"/>
+          <geom name="jaw_r" class="grip" type="box" size="0.005000 0.007000 0.001500" pos="-0.010770 0.046870 -0.001500"/>
+          <site name="tip_r" pos="-0.015820 0.046870 -0.001500" size="0.0008" rgba="1 0 0 1"/>
+        </body>
+      </body>
+      <body name="link_r" pos="0.002770 0.055880 0.000000">
+        <joint name="link_pin_r" type="hinge" axis="0 0 1" damping="0.0005" armature="0.000005"/>
+        <geom class="vis" mesh="grip_link_r" pos="-0.002770 -0.055880 -0.000000" rgba="0.72 0.55 0.80 1"/>
+      </body>
+    </body>
+    </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+            <body name="floor_1" pos="-0.0065070610979302045 -0.00650706109793024 0.0" euler="0.0 -0.0 0.0">
+                <geom name="floor_1_geom" type="mesh" mesh="floor_1" pos="0 0 0" euler="0 0 0" contype="0" conaffinity="0" group="2" mass="5.0" rgba="0.90 0.90 0.88 1" />
+                </body>
+        </body>
+    </worldbody><equality>
+    <!-- the two pins that close each four-bar loop (link to finger) -->
+    <connect name="pin_l" body1="link_l" body2="finger_l" anchor="-0.013130 0.028080 0.000000"/>
+    <connect name="pin_r" body1="link_r" body2="finger_r" anchor="0.013130 0.028080 0.000000"/>
+    <!-- the two gears mesh: equal and opposite -->
+    <joint name="mesh" joint1="gear_r" joint2="gear_l" polycoef="0 -1 0 0 0"/>
+  </equality><actuator><general name="shoulder" joint="Revolute-7" biastype="affine" gainprm="1.308997" biasprm="-145.552167 -150.0 -8.0" ctrlrange="0 160" forcerange="-6.0 6.0"/><general name="elbow" joint="Revolute-12" biastype="affine" gainprm="-2.670354" biasprm="152.763864 -150.0 -8.0" ctrlrange="0 160" forcerange="-6.0 6.0"/><general name="wrist" joint="Revolute-14" biastype="affine" gainprm="-2.408554" biasprm="248.089081 -150.0 -8.0" ctrlrange="0 148" forcerange="-6.0 6.0"/><general name="wrist_rotate" joint="Revolute-13" biastype="affine" gainprm="0.349066" biasprm="-14.660766 -20 -1.0" ctrlrange="0 90" forcerange="-2 2"/><general name="base_deg" joint="Revolute-4" biastype="affine" gainprm="2.617994" biasprm="0.000000 -150 -10" ctrlrange="-135 135" forcerange="-8 8"/><general name="gripper" joint="gear_l" biastype="affine" gainprm="-0.020211" biasprm="2.704911 -1.5 -0.12" ctrlrange="40 160" forcerange="-0.6 0.6"/></actuator>
+</mujoco>

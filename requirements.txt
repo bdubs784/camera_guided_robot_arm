@@ -1,0 +1,17 @@
+# Raspberry Pi (pi/)
+numpy
+numba                   # compiled grasp solver (pi/armlab/fastik.py); without it the Python path runs, ~15x slower
+opencv-contrib-python   # AprilTags (cv2.aruco); on the Pi the system python3-opencv also works
+flask                   # camera service (dual_cam_stream.py)
+pyserial                # UART link to the ESP32 (apt: python3-serial)
+# picamera2             # on the Pi: sudo apt install python3-picamera2
+
+# tests
+pytest
+
+# laptop tools (tools/, sim/)
+scipy
+scikit-learn            # slack model (train_slack_gp.py, slack_check.py)
+threadpoolctl
+mujoco                  # sim/arm_twin, build_world_map.py
+pillow

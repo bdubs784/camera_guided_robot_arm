@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arm Live</title>
+<style>
+:root{--bg:#0b0d10;--panel:#14181e;--panel2:#10141a;--line:#232a33;--ink:#e8edf3;--dim:#8a95a4;--faint:#55606e;
+  --accent:#4fd1c5;--good:#5ad48a;--warn:#f2c14e;--bad:#ef6b6b;--block:#ff4fd8;--aim:#7aa2ff}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,"Segoe UI",sans-serif}
+html,body{height:100%;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;padding:12px 16px;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px;transform-origin:0 0}
+.num{font-variant-numeric:tabular-nums}
+header{display:flex;align-items:flex-end;gap:22px}
+#step{font-size:40px;font-weight:700;letter-spacing:-.01em;line-height:1.05}
+#sub{color:var(--dim);font-size:18px;margin-top:4px}
+.kpis{margin-left:auto;display:flex;gap:22px}
+.kpi{text-align:right}.kpi .v{font-size:36px;font-weight:700;line-height:1}.kpi .l{font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+.chain{display:flex;gap:5px;flex-wrap:nowrap;overflow:hidden}
+.chain span{font-size:14px;padding:5px 11px;border-radius:999px;background:var(--panel);color:var(--faint);border:1px solid var(--line);white-space:nowrap}
+.chain span.done{color:var(--dim);border-color:#2c3540}
+.chain span.now{background:var(--accent);color:#04201c;border-color:var(--accent);font-weight:700}
+main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.9fr) 645px;gap:10px;min-height:0}
+.col{display:grid;gap:10px;min-height:0}
+.cams{grid-template-rows:minmax(0,1.7fr) minmax(0,1fr)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;min-height:0}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:stretch}
+.side{grid-template-rows:minmax(0,1fr) auto !important}
+.quad .card{padding:10px 12px}
+.quad .card .v{font-size:22px}.quad .card .s{font-size:14px}
+.quad .joints{grid-template-columns:62px 1fr 56px;gap:8px 8px;font-size:15px}
+.quad .bars{grid-template-columns:104px 1fr 62px;gap:7px 8px;font-size:15px}
+.quad .camrow{grid-template-columns:66px 1fr 44px 56px;gap:5px 8px;font-size:15px}
+.quad .badge{font-size:17px}
+#slot{aspect-ratio:16/9;border:2px dashed #2c3540;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  color:#2c3540;font-size:22px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.cam{position:relative;background:#000;border-radius:10px;overflow:hidden;border:1px solid var(--line);min-height:0}
+.cam img{display:block;width:100%;height:100%;object-fit:contain}
+.cam canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.cam .tag{position:absolute;left:8px;bottom:7px;font-size:15px;font-weight:600;background:#000b;padding:3px 8px;border-radius:6px}
+.cam .tag i{font-style:normal;color:var(--dim);font-weight:500}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-height:0;overflow:hidden}
+.card h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.card h3 em{font-style:normal;text-transform:none;letter-spacing:0;color:var(--faint);font-weight:500}
+.card .v{font-size:28px;font-weight:700;line-height:1.15}
+.card .s{font-size:16px;color:var(--dim);margin-top:4px;line-height:1.4}
+.card{padding:12px 16px}
+.mapcol{grid-template-rows:minmax(0,1fr) auto auto}
+.joints{display:grid;grid-template-columns:84px 1fr 70px;gap:10px 10px;align-items:center;font-size:17px}
+.track{height:18px;background:var(--panel2);border-radius:7px;position:relative;border:1px solid #1c232c}
+.track .tg{position:absolute;top:-3px;width:12px;height:22px;margin-left:-6px;border:2px solid #7aa2ff;border-radius:3px;opacity:.75}
+.track .cur{position:absolute;top:1px;height:14px;width:6px;margin-left:-3px;background:var(--accent);border-radius:2px;transition:left .18s linear}
+.track .cur.mv{background:var(--warn);box-shadow:0 0 8px var(--warn)}
+.track .real{position:absolute;top:-5px;height:26px;width:3px;margin-left:-1px;background:var(--block)}
+#map{width:100%;height:100%;display:block}
+.side{grid-template-rows:auto auto auto auto auto;align-content:start;overflow:hidden}
+.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.badge{display:inline-block;padding:3px 14px;border-radius:999px;font-size:20px;font-weight:700}
+.badge.good{background:#173d29;color:var(--good)}.badge.bad{background:#401c1c;color:var(--bad)}.badge.warn{background:#3d3317;color:var(--warn)}.badge.dim{background:#1d232b;color:var(--dim)}
+.bars{display:grid;grid-template-columns:140px 1fr 78px;gap:9px 10px;align-items:center;font-size:17px}
+.bars .bar{height:12px;background:var(--panel2);border-radius:4px;position:relative;overflow:hidden}
+.bars .bar i{position:absolute;top:0;height:12px;border-radius:4px;background:var(--accent)}
+.bars .bar.mid:after{content:"";position:absolute;left:50%;top:0;width:1px;height:8px;background:#3a4450}
+.bars .bar b{position:absolute;top:0;width:3px;height:12px;background:var(--ink)}
+.bars span:last-child,.bars .r{text-align:right}
+.camrow{display:grid;grid-template-columns:90px 1fr 80px 70px;gap:6px 10px;font-size:17px;align-items:center}
+.camrow .ok{color:var(--block);font-weight:700}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+footer{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1.82fr);gap:10px;align-items:stretch}
+.timeline{display:flex;height:34px;border-radius:7px;overflow:hidden;background:var(--panel);border:1px solid var(--line)}
+.timeline div{display:flex;align-items:center;justify-content:center;font-size:14px;color:#06211e;white-space:nowrap;overflow:hidden;border-right:1px solid #0b0d10}
+.fl{display:flex;align-items:center;gap:12px}.fl .lbl{color:var(--dim);font-size:16px;white-space:nowrap;min-width:150px}
+#hist{display:flex;align-items:flex-end;gap:5px;height:54px}
+#hist div{flex:1;max-width:60px;border-radius:5px 5px 0 0;position:relative;font-size:14px;color:#06211e;font-weight:700;display:flex;align-items:flex-start;justify-content:center;padding-top:2px}
+#replay{display:none;position:fixed;right:14px;bottom:10px;font-size:11px;color:var(--warn);background:#3d3317;padding:3px 9px;border-radius:999px}
+</style></head><body><div id="stage">
+<header>
+  <div><div id="step">Waiting to start</div><div id="sub" class="num">&nbsp;</div></div>
+  <div class="kpis num">
+    <div class="kpi"><div class="v" id="kPicked">&ndash;</div><div class="l">picked up</div></div>
+    <div class="kpi"><div class="v" id="kPlaced">&ndash;</div><div class="l">set down, confirmed</div></div>
+    <div class="kpi"><div class="v" id="kSecs">&ndash;</div><div class="l">s per round</div></div>
+    <div class="kpi"><div class="v" id="kReach">&ndash;</div><div class="l">reach used, mm</div></div>
+  </div>
+</header>
+<div class="chain" id="chain"></div>
+<main>
+  <div class="col cams">
+    <div class="cam" id="cam-gripper"><img alt="gripper camera"><canvas></canvas><div class="tag">Gripper camera <i>rides on the hand</i></div></div>
+    <div class="row2">
+      <div class="cam" id="cam-torre"><img alt="tower camera"><canvas></canvas><div class="tag">Tower camera</div></div>
+      <div class="cam" id="cam-webcam"><img alt="webcam"><canvas></canvas><div class="tag">Webcam <i>overhead</i></div></div>
+    </div>
+  </div>
+  <div class="col mapcol">
+    <div class="card" style="padding:10px 12px 6px;display:grid;grid-template-rows:auto minmax(0,1fr)">
+      <h3>Top-down <em>mm from the base axis</em></h3>
+      <svg id="map" viewBox="-345 -425 690 310" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="card"><h3>Set-down</h3><div class="v num" id="pV">&ndash;</div><div class="s num" id="pSub">&nbsp;</div></div>
+    <div class="card"><h3>Block <em>Kalman filter</em></h3>
+      <svg id="ring" width="64" height="64" viewBox="0 0 58 58" style="float:right;margin-left:6px"></svg>
+      <div class="v num" id="bPos">&ndash;</div><div class="s num" id="bSub">&nbsp;</div></div>
+  </div>
+  <div class="col side">
+    <div class="quad">
+      <div class="card"><h3>Joints <em id="telHz">live from the ESP32</em></h3><div class="joints num" id="joints"></div>
+        <div class="s num" id="telSub" style="margin-top:6px;font-size:12.5px">&nbsp;</div></div>
+      <div class="card"><h3>Cameras <em>reads/s · age</em></h3><div class="camrow num" id="cams"></div></div>
+      <div class="card"><h3>Safety &amp; system</h3><div class="bars num" id="sys"></div><div class="s num" id="sysSub" style="font-size:12.5px">&nbsp;</div></div>
+      <div class="card"><h3>Grip <em>squeeze test</em></h3><div class="v" id="gV">&ndash;</div><div class="s num" id="gSub">&nbsp;</div></div>
+    </div>
+    <div id="slot">arm camera</div>
+  </div>
+</main>
+<footer>
+  <div>
+    <div class="fl"><div class="lbl num" id="tlTotal">this round</div><div class="timeline" id="timeline" style="flex:1"></div></div>
+  </div>
+  <div class="fl"><div class="lbl" style="min-width:110px">rounds, s</div><div id="hist" style="flex:1"></div></div>
+</footer>
+</div>
+<div id="replay">REPLAY of a recorded show</div>
+<script>
+// the page is laid out for 1920 x 1080 and scaled to the window like a slide, so it reads the same full screen or
+// side by side with the arm in a screen recording
+function fit() {
+  const st = document.getElementById("stage"), k = Math.min(innerWidth / 1920, innerHeight / 1080);
+  st.style.transform = `scale(${k})`;
+  st.style.left = `${(innerWidth - 1920 * k) / 2}px`; st.style.top = `${(innerHeight - 1080 * k) / 2}px`;
+}
+addEventListener("resize", fit); fit();
+const q = new URLSearchParams(location.search);
+const CAM = q.get("cam") || (location.protocol + "//" + location.hostname + ":8080");
+const LIVE = q.get("live") || "/live";
+const STILL = q.has("still");                      // poll single pictures (replay) instead of the live streams
+if (q.has("replay")) document.getElementById("replay").style.display = "block";
+const STEPS = ["Finding the block","Planning the grab","Looking from more angles","Moving above the block","Close-up look",
+  "Reaching in","Closing the gripper","Lifting it","Checking the grip","Carrying it","Setting it down","Letting go",
+  "Checking where it landed","Going home"];
+const ALIAS = {"Re-planning from up close":"Close-up look","Choosing where to put it":"Checking the grip","Round done":"Going home"};
+const COLORS = ["#4fd1c5","#7aa2ff","#c792ea","#f2c14e","#5ad48a","#ef8f6b","#62c2ff","#e0e36a","#ff8fb1","#9bd17a"];
+const CAMS = [["gripper","Gripper"],["torre","Tower"],["webcam","Webcam"]];
+const REACH_MM = 390;                               // where pickups stop working (in a sweep 384 held 16/16, 400 none)
+const $ = id => document.getElementById(id);
+const fmt = (v, d=0) => v==null || isNaN(v) ? "–" : Number(v).toFixed(d);
+const sgn = (v, d=1) => v==null || isNaN(v) ? "–" : (v >= 0 ? "+" : "") + Number(v).toFixed(d);
+let last = {}, liveAt = 0, trail = [];
+
+// ---------- camera pictures
+for (const [name] of CAMS) {
+  const img = document.querySelector(`#cam-${name} img`);
+  if (STILL) {
+    const tick = () => { img.src = `${CAM}/snap/${name}?t=${Date.now()}`; };
+    tick(); setInterval(tick, 450);
+  } else {
+    img.src = name === "webcam" ? `${CAM}/stream/webcam` : `${CAM}/${name}`;
+  }
+}
+
+function drawBlock(name, cam) {
+  const box = $("cam-" + name), img = box.querySelector("img"), cv = box.querySelector("canvas");
+  const w = img.clientWidth, h = img.clientHeight; if (!w || !h) return;
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const g = cv.getContext("2d"); g.clearRect(0, 0, w, h);
+  const t = cam && Array.isArray(cam.tags) ? cam.tags.find(t => t.id === 7 && t.corners) : null;
+  if (!t) return;
+  const nw = img.naturalWidth || 640, nh = img.naturalHeight || 480, k = Math.min(w / nw, h / nh);
+  const ox = (w - nw * k) / 2, oy = (h - nh * k) / 2;
+  const size = Array.isArray(cam.size) ? cam.size : [nw, nh], sx = nw * k / size[0], sy = nh * k / size[1];
+  const pts = t.corners.map(p => [ox + p[0] * sx, oy + p[1] * sy]);
+  const cx = pts.reduce((a, p) => a + p[0], 0) / 4, cy = pts.reduce((a, p) => a + p[1], 0) / 4, grow = 1.9;
+  g.lineWidth = 4; g.strokeStyle = "#ff4fd8"; g.shadowColor = "#ff4fd8"; g.shadowBlur = 14;
+  g.beginPath(); pts.forEach((p, i) => { const x = cx + (p[0]-cx)*grow, y = cy + (p[1]-cy)*grow; i ? g.lineTo(x, y) : g.moveTo(x, y); });
+  g.closePath(); g.stroke(); g.shadowBlur = 0;
+  g.font = "bold 14px Inter, system-ui, sans-serif"; g.fillStyle = "#ff4fd8";
+  g.fillText("BLOCK", cx - 22, Math.min(...pts.map(p => cy + (p[1]-cy)*grow)) - 8);
+}
+
+function renderCams(d) {
+  const piNow = last.now ? last.now + (Date.now() - liveAt) / 1000 : null;
+  $("cams").innerHTML = "" +
+    CAMS.map(([n, label]) => {
+      const c = d && d[n];
+      if (!c || typeof c !== "object") return `<span>${label}</span><span class="s">no data</span><span></span><span></span>`;
+      const tags = Array.isArray(c.tags) ? c.tags : [], n7 = tags.some(t => t.id === 7);
+      const age = piNow && c.t_cap ? Math.max(0, piNow - c.t_cap) : null;
+      const ac = age == null ? "" : age < 0.35 ? "good" : age < 0.8 ? "warn" : "bad";
+      return `<span>${label}</span><span>${n7 ? '<span class="ok">BLOCK</span>' : '<span style="color:var(--faint)">no block</span>'}</span>` +
+             `<span class="r">${fmt(c.detect_hz, 1)}</span><span class="r ${ac}">${age == null ? "–" : fmt(age, 2) + " s"}</span>`;
+    }).join("");
+}
+
+async function camTick() {
+  try {
+    const d = await (await fetch(`${CAM}/tags?view=1`, {cache: "no-store"})).json();
+    for (const [name] of CAMS) drawBlock(name, d[name]);
+    renderCams(d);
+  } catch (e) { renderCams(null); }
+}
+
+// ---------- the top-down map
+// seen from above, the base at the bottom, straight out (bearing 0) up, + bearings to the left
+const P = (r, b) => [-r * Math.sin(b * Math.PI / 180), -r * Math.cos(b * Math.PI / 180)];
+function arc(r, b0, b1) {
+  const [x0, y0] = P(r, b0), [x1, y1] = P(r, b1);
+  return `M${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 0 0 ${x1.toFixed(1)},${y1.toFixed(1)}`;
+}
+function drawMap(s) {
+  const radii = Array.isArray(s.radii) && s.radii.length ? s.radii : [270, 305, 340, 365];
+  const [b0, b1] = Array.isArray(s.bearings) && s.bearings.length === 2 ? s.bearings : [-45, 50];
+  const lo = Math.min(...radii) - 15, hi = Math.max(...radii) + 15;
+  let o = "";
+  // the practice area (where show may set the block down) and the reach limit
+  o += `<path d="${arc(hi, b0, b1)} L${P(lo, b1).map(v => v.toFixed(1)).join(",")} ${arc(lo, b1, b0).replace("M", "L").replace(" 0 0 0 ", " 0 0 1 ")} Z" fill="#4fd1c50d" stroke="#4fd1c533"/>`;
+  o += `<path d="${arc(REACH_MM, b0 - 8, b1 + 8)}" fill="none" stroke="#ef6b6b88" stroke-dasharray="6 6" stroke-width="2"/>`;
+  o += `<text x="0" y="${-REACH_MM - 9}" fill="#ef6b6bcc" font-size="19" text-anchor="middle">reach limit</text>`;
+  for (const r of radii) {
+    const on = s.want_r != null && Math.abs(s.want_r - r) < 1;
+    o += `<path d="${arc(r, b0, b1)}" fill="none" stroke="${on ? "#4fd1c5" : "#2c3540"}" stroke-width="${on ? 3 : 1.5}"/>`;
+    const [x, y] = P(r, b0 - 1.5);
+    o += `<text x="${x + 6}" y="${y + 5}" fill="${on ? "#4fd1c5" : "#8a95a4"}" font-size="21" font-weight="${on ? 700 : 400}">${r}</text>`;
+  }
+  for (const b of [b0, 0, b1]) { const [x, y] = P(hi + 10, b); o += `<line x1="0" y1="0" x2="${x}" y2="${y}" stroke="#232a33" stroke-dasharray="2 5"/>`; }
+  o += `<text x="0" y="-124" fill="#8a95a4" font-size="18" text-anchor="middle">&darr; base axis</text>`;
+  // where the block has been: a faded trail, newest brightest
+  trail.forEach((t, i) => {
+    const [x, y] = P(t[0], t[1]), a = 0.15 + 0.5 * (i + 1) / trail.length;
+    o += `<circle cx="${x}" cy="${y}" r="5" fill="#ff4fd8" opacity="${a.toFixed(2)}"/>`;
+  });
+  // the set-down: aim -> let go -> landed
+  const p = s.place || {};
+  if (Array.isArray(p.spot)) {
+    const [x, y] = P(p.spot[0], p.spot[1]);
+    o += `<g stroke="#7aa2ff" stroke-width="2.5"><line x1="${x-11}" y1="${y}" x2="${x+11}" y2="${y}"/><line x1="${x}" y1="${y-11}" x2="${x}" y2="${y+11}"/></g>` +
+         `<circle cx="${x}" cy="${y}" r="16" fill="none" stroke="#7aa2ff88" stroke-dasharray="3 4"/>` +
+         `<text x="${x}" y="${y - 22}" fill="#7aa2ff" font-size="19" font-weight="700" text-anchor="middle">aim</text>`;
+  }
+  if (Array.isArray(p.let_go)) { const [x, y] = P(p.let_go[0], p.let_go[1]); o += `<circle cx="${x}" cy="${y}" r="6" fill="none" stroke="#f2c14e" stroke-width="2.5"/>`; }
+  if (Array.isArray(p.let_go) && Array.isArray(p.found)) {
+    const [x0, y0] = P(p.let_go[0], p.let_go[1]), [x1, y1] = P(p.found[0], p.found[1]);
+    o += `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="#f2c14e" stroke-width="2" marker-end="url(#ah)"/>`;
+  }
+  // the block estimate and its 1-sigma circle (true scale, never under 4 px)
+  const b = s.block || {};
+  if (b.out_mm != null && b.bearing_deg != null) {
+    const [x, y] = P(b.out_mm, b.bearing_deg), r = Math.max(4, (b.sigma_mm || 0));
+    o += `<circle cx="${x}" cy="${y}" r="${r + 9}" fill="#ff4fd822" stroke="#ff4fd8" stroke-width="2"/>` +
+         `<rect x="${x-7}" y="${y-7}" width="14" height="14" fill="#ff4fd8" transform="rotate(${-(b.yaw_deg || 0) - b.bearing_deg} ${x} ${y})"/>` +
+         `<text x="${x}" y="${y + r + 30}" fill="#ff4fd8" font-size="21" font-weight="700" text-anchor="middle">${fmt(b.out_mm)} mm</text>`;
+  }
+  $("map").innerHTML = `<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f2c14e"/></marker></defs>` + o +
+    `<g font-size="17" fill="#8a95a4" transform="translate(-340,-212)">` +
+    `<rect x="0" y="-10" width="11" height="11" fill="#ff4fd8"/><text x="16" y="0">block (±1σ)</text>` +
+    `<line x1="0" y1="18" x2="14" y2="18" stroke="#7aa2ff" stroke-width="2.5"/><text x="20" y="23">aim</text>` +
+    `<circle cx="6" cy="40" r="5" fill="none" stroke="#f2c14e" stroke-width="2.5"/><text x="20" y="45">let go → landed</text>` +
+    `<line x1="0" y1="62" x2="14" y2="62" stroke="#4fd1c5" stroke-width="3"/><text x="20" y="67">this round's target</text></g>`;
+}
+
+// ---------- the joints, from the ESP32's telemetry
+const JOINTS = ["shoulder","elbow","wrist","rotate","gripper","base"];
+function renderJoints(s) {
+  const t = s.tel, sl = s.slack || {};
+  if (!t || !Array.isArray(t.p) || !Array.isArray(t.lim)) {
+    $("joints").innerHTML = `<span class="s" style="grid-column:1/-1">telemetry starts with the first round</span>`; return;
+  }
+  const real = {0: sl.shoulder, 1: sl.elbow, 2: sl.wrist};
+  $("joints").innerHTML = JOINTS.map((n, i) => {
+    const [lo, hi] = t.lim[i] || [0, 180], at = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+    const p = t.p[i], tg = (t.tg || [])[i], mv = (t.mv || [])[i];
+    if (p == null) return "";
+    const r = real[i] != null ? `<i class="real" style="left:${at(p + real[i])}%" title="real (cameras)"></i>` : "";
+    return `<span>${n}</span><div class="track"><i class="tg" style="left:${at(tg != null ? tg : p)}%"></i>${r}` +
+           `<i class="cur ${mv ? "mv" : ""}" style="left:${at(p)}%"></i></div><span class="r">${fmt(p, 1)}°</span>`;
+  }).join("");
+  $("telHz").textContent = t.hz ? `live from the ESP32 · ${fmt(t.hz)}/s` : "live from the ESP32";
+  $("telSub").innerHTML = `<span style="color:var(--accent)">▮</span> commanded &nbsp; <span style="color:#7aa2ff">▯</span> target &nbsp; <span style="color:var(--block)">|</span> real (cameras)`;
+}
+
+// ---------- everything else
+function ring(sigma) {
+  const r = sigma == null ? 0 : Math.max(3, Math.min(26, sigma * 4));
+  $("ring").innerHTML = `<circle cx="29" cy="29" r="26" fill="none" stroke="#232a33" stroke-width="2"/>` +
+    (r ? `<circle cx="29" cy="29" r="${r}" fill="#ff4fd833" stroke="#ff4fd8" stroke-width="2"/>` : "") +
+    `<circle cx="29" cy="29" r="2" fill="#e8edf3"/>`;
+}
+
+function bar(label, v, max, value, cls, mark) {
+  const w = Math.max(0, Math.min(100, v / max * 100));
+  return `<span>${label}</span><div class="bar"><i style="left:0;width:${w}%;${cls ? `background:var(--${cls})` : ""}"></i>` +
+    (mark != null ? `<b style="left:${Math.min(100, mark / max * 100)}%"></b>` : "") + `</div><span class="${cls || ""}">${value}</span>`;
+}
+
+function render(s) {
+  const step = s.step || "Waiting to start";
+  $("step").textContent = step;
+  const parts = [];
+  if (s.round) parts.push(`Round ${s.round} of ${s.rounds || "?"}`);
+  if (s.want_r) parts.push(`target ${fmt(s.want_r)} mm`);
+  if (s.t_round0 && s.now) parts.push(`${fmt(s.now - s.t_round0)} s`);
+  if (s.result) parts.push(s.result);
+  $("sub").textContent = parts.join("  ·  ") || " ";
+  const at = STEPS.indexOf(ALIAS[step] || step);
+  $("chain").innerHTML = STEPS.map((n, i) => `<span class="${i < at ? "done" : i === at ? "now" : ""}">${n}</span>`).join("");
+
+  // headline numbers
+  const sc = s.score || {}, hist = Array.isArray(s.history) ? s.history : [];
+  $("kPicked").textContent = sc.rounds ? `${sc.picked}/${sc.rounds}` : "–";
+  $("kPlaced").textContent = sc.rounds && sc.placed != null ? `${sc.placed}/${sc.rounds}` : "–";
+  const secs = hist.filter(h => h[2] === "ok" && h[1] != null).map(h => h[1]);
+  $("kSecs").textContent = secs.length ? fmt(secs.reduce((a, v) => a + v, 0) / secs.length, 1) : "–";
+  $("kReach").textContent = sc.rmin != null ? `${fmt(sc.rmin)}–${fmt(sc.rmax)}` : "–";
+
+  // the block filter
+  const b = s.block || {};
+  if (b.out_mm != null) {
+    $("bPos").textContent = `${fmt(b.out_mm)} mm`;
+    $("bSub").textContent = b.sigma_mm != null ? `±${fmt(b.sigma_mm, 1)} mm · ${b.looks || 1} look${(b.looks || 1) > 1 ? "s" : ""}` : "1 look";
+    const key = `${Math.round(b.out_mm)}:${Math.round(b.bearing_deg)}`;
+    if (!trail.length || trail[trail.length - 1][2] !== key) { trail.push([b.out_mm, b.bearing_deg, key]); trail = trail.slice(-14); }
+  } else { $("bPos").textContent = "–"; $("bSub").textContent = " "; }
+  ring(b.sigma_mm);
+
+  renderJoints(s);
+
+  // the grip
+  const gr = s.grip || {};
+  if (gr.held != null || gr.closed_mm != null) {
+    const cls = gr.held === true ? "good" : gr.held === false ? "bad" : "warn";
+    $("gV").innerHTML = `<span class="badge ${cls}">${gr.held === true ? "HOLDING" : gr.held === false ? "EMPTY" : "NOT SEEN"}</span>`;
+    const sp = gr.spacing || {};
+    $("gSub").textContent = sp.squeezed != null ? `finger gap ${fmt(sp.squeezed, 1)} mm` : " ";
+  } else { $("gV").innerHTML = `<span class="badge dim">–</span>`; $("gSub").textContent = " "; }
+
+  // the set-down
+  const p = s.place || {};
+  if (p.spot_r_mm != null) {
+    if (p.off_spot_mm != null) {
+      const cls = p.off_spot_mm <= 10 ? "good" : p.off_spot_mm <= 20 ? "warn" : "bad";
+      $("pV").innerHTML = `<span class="${cls}">${fmt(p.off_spot_mm, 1)} mm off</span>`;
+    } else $("pV").textContent = "on its way";
+    $("pSub").textContent = `aim ${fmt(p.spot_r_mm)} mm out`;
+  } else { $("pV").textContent = "–"; $("pSub").textContent = " "; }
+
+  // safety and the Pi
+  const sf = s.safety || {}, cpu = s.cpu || {};
+  let sys = "";
+  if (sf.min != null) sys += bar("clearance", sf.min, 120, `${fmt(sf.min)} mm`, sf.min >= sf.margin + 10 ? "good" : "warn", sf.margin);
+  if (cpu.busy != null) sys += bar("Pi CPU", cpu.busy, 100, `${fmt(cpu.busy)}%`, cpu.busy < 85 ? "" : "warn");
+  if (cpu.temp != null) sys += bar("Pi temp", cpu.temp - 30, 55, `${fmt(cpu.temp)}°C`, cpu.temp < 75 ? "good" : cpu.temp < 80 ? "warn" : "bad", 50);
+  const tl = s.tel || {};                            // the shoulder servo's sensor (rests limp at 55 C: --shoulder-hot)
+  if (tl.temp != null) sys += bar("Shoulder temp", tl.temp - 20, 40, `${fmt(tl.temp)}°C`, tl.temp < 45 ? "good" : tl.temp < 55 ? "warn" : "bad", 35);
+  if (tl.loop_ms != null) sys += bar("ESP32 loop", tl.loop_ms, 10, `${fmt(tl.loop_ms, 1)} ms`, tl.loop_ms < 5 ? "good" : "warn");
+  $("sys").innerHTML = sys || `<span class="s" style="grid-column:1/-1">waiting for the first move</span>`;
+  const lines = [];
+  if (sf.n) lines.push(`${sf.n} moves checked`);
+  const pl = s.plan;
+  if (pl && pl.ms != null) lines.push(`plan ${pl.source === "scratch" ? "from scratch" : "from table"} ${fmt(pl.ms)} ms`);
+  const lk = s.link;
+  if (lk && lk.kind === "cable") {
+    const now = Date.now();
+    if (render.lk && now > render.lk[1]) render.rate = (lk.count - render.lk[0]) / ((now - render.lk[1]) / 1000);
+    render.lk = [lk.count, now];
+    lines.push(`link ${fmt(lk.rtt_ms, 1)} ms, ${lk.bad} bad`);
+  } else if (lk) lines.push("link WiFi");
+  $("sysSub").textContent = lines.join(" · ") || " ";
+
+  // this round's parts, and every round so far
+  const laps = Array.isArray(s.laps) ? s.laps : [], tot = laps.reduce((a, r) => a + r[1], 0);
+  $("timeline").innerHTML = laps.map((r, i) => `<div title="${r[0]} ${r[1]} s" style="flex:${Math.max(r[1], 0.2)};background:${COLORS[i % COLORS.length]}">${r[1] >= 3 ? r[0] : ""}</div>`).join("");
+  $("tlTotal").textContent = laps.length ? `this round: ${Math.round(tot)} s` : "this round";
+  const mx = Math.max(45, ...hist.map(h => h[1] || 0));
+  $("hist").innerHTML = hist.map(h => {
+    const c = h[2] === "ok" ? "var(--good)" : h[2] === "held" ? "var(--warn)" : "var(--bad)";
+    return `<div title="round ${h[0]}: ${fmt(h[1])} s" style="height:${Math.max(14, (h[1] || 0) / mx * 46)}px;background:${c}">${fmt(h[1])}</div>`;
+  }).join("");
+  drawMap(s);
+}
+
+async function liveTick() {
+  try { last = await (await fetch(LIVE, {cache: "no-store"})).json(); liveAt = Date.now(); render(last); }
+  catch (e) { $("sub").textContent = "lost touch with the arm"; }
+}
+setInterval(liveTick, 300); setInterval(camTick, 300); liveTick(); camTick();
+</script>
+</body></html>
