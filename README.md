@@ -61,7 +61,9 @@ comes from a **world model** solved from survey data by bundle adjustment, not f
 
 ## The hardware
 
-![The arm on its table](docs/images/arm_photo.jpg)
+<p align="center">
+  <img src="docs/images/arm_photo.jpg" alt="The arm on its table" width="560">
+</p>
 
 I designed the arm in Fusion 360 and printed it. A NEMA 17 stepper turns the base through a 40:1 worm gear, and
 the whole tower turns with it: the arm, the Raspberry Pi 5 and two of the cameras. The shoulder's servo drives

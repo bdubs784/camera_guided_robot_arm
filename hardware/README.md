@@ -4,7 +4,9 @@ I designed the arm in Fusion 360 and printed it on a Bambu A1. It has a stepper-
 (shoulder, elbow, wrist, wrist rotate, gripper) and three cameras. The structure, the gearbox and the bearing races
 are printed.
 
-![The arm on its table, with the tower, shoulder gearbox and gripper camera](../docs/images/arm_photo.jpg)
+<p align="center">
+  <img src="../docs/images/arm_photo.jpg" alt="The arm on its table, with the tower, shoulder gearbox and gripper camera" width="560">
+</p>
 
 | Part | Actuator | Notes |
 |---|---|---|
@@ -39,7 +41,9 @@ arm, where the arm appears to them doesn't depend on the base angle at all, so t
 when they watch the arm. Their job becomes working out where things are in the world, like the block and the table
 tags, and those same table tags are how the base angle gets measured.
 
-![The tower in CAD: the worm and 40-tooth gear at the bottom, the bearing race, the braced column and the shoulder mount](../docs/images/cad_tower.png)
+<p align="center">
+  <img src="../docs/images/cad_tower.png" alt="The tower in CAD: the worm and 40-tooth gear at the bottom, the bearing race, the braced column and the shoulder mount" width="260">
+</p>
 
 ## Shoulder
 
@@ -50,7 +54,9 @@ world model solves the exact gearing from survey data anyway. An extension sprin
 servo only carries about half its weight. The shoulder pivots in printed supports with their own ball races (5/32"
 balls).
 
-![The shoulder gearbox exploded: servo housing, carrier, planets and ring gear, and the bearing it turns on](../docs/images/cad_shoulder_gearbox.png)
+<p align="center">
+  <img src="../docs/images/cad_shoulder_gearbox.png" alt="The shoulder gearbox exploded: servo housing, carrier, planets and ring gear, and the bearing it turns on" width="420">
+</p>
 
 ## Elbow and wrist
 
@@ -58,7 +64,9 @@ The upper arm is 109 mm and the forearm 100 mm (pivot to pivot, from the CAD). B
 MG996R servos driving their joints directly. The wrist is limited to where the gripper camera would hit the elbow
 spring's mount.
 
-![The upper arm, forearm and wrist in CAD, with the servos in their brackets](../docs/images/cad_arm_links.png)
+<p align="center">
+  <img src="../docs/images/cad_arm_links.png" alt="The upper arm, forearm and wrist in CAD, with the servos in their brackets" width="520">
+</p>
 
 ## Wrist rotate
 
@@ -73,9 +81,10 @@ fingers open to 65 mm around a 39.7 mm block and reach 84 mm in front of the gea
 on the hand, looking down past the fingers, and each finger carries an AprilTag so the cameras can see how far it's
 open.
 
-| Real | CAD |
-|---|---|
-| ![The gripper on the arm, holding open beside the block](../docs/images/gripper_photo.jpg) | ![The gripper in CAD, opened wide: the two meshed gears and the linkage that keeps the fingers parallel](../docs/images/cad_gripper.png) |
+<p align="center">
+  <img src="../docs/images/gripper_photo.jpg" alt="The gripper on the arm, holding open beside the block" width="300">
+  <img src="../docs/images/cad_gripper.png" alt="The gripper in CAD, opened wide: the two meshed gears and the linkage that keeps the fingers parallel" width="460">
+</p>
 
 ## Tags on the arm
 
